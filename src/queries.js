@@ -22,26 +22,28 @@ const commits = {
 
     const data = await getCommits('bramis', 'giVR', params)
 
-    return data.reduce((result, commit) => {
-      const c = {}
+    return data.reduce
+      ? data.reduce((result, commit) => {
+        const c = {}
 
-      ;(fields || Object.keys(Commit)).map(f => {
-        switch (f) {
-          case 'date':
-            c[f] = commit.commit.author.date
-            break
-          case 'message':
-            c[f] = commit.commit.message
-            break
-          default:
-            c[f] = commit[f]
-        }
-      })
+          ;(fields || Object.keys(Commit)).map(f => {
+          switch (f) {
+            case 'date':
+              c[f] = commit.commit.author.date
+              break
+            case 'message':
+              c[f] = commit.commit.message
+              break
+            default:
+              c[f] = commit[f]
+          }
+        })
 
-      console.log(c)
+        console.log(c)
 
-      return [...result, c]
-    }, [])
+        return [...result, c]
+      }, [])
+      : []
   }
 }
 
