@@ -17,7 +17,7 @@
     "linebreak-style": "off",
     "comma-dangle": ["off", "always-multiline"],
     "no-multi-spaces": "off",
-    "max-len": ["warn", 150],
+    "max-len": ["warn", 100],
     "jest/no-disabled-tests": "warn",
     "jest/no-focused-tests": "error",
     "jest/no-identical-title": "error",
