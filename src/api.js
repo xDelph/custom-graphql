@@ -1,4 +1,4 @@
-const githubToken = process.env.GITHUB_TOKEN || 'a97e159b072f201d4ad8bbd837f2cd3eed31469a'
+const githubToken = process.env.GITHUB_TOKEN
 const githubApi = 'https://api.github.com'
 
 const axios = require('axios')

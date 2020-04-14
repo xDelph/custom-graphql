@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "node index.js",
-    "start:dev": "nodemon index.js"
+    "start:dev": "nodemon index.js",
+    "top": "nodemon top.js"
   },
   "dependencies": {
     "axios": "^0.19.2",
