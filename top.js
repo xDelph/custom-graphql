@@ -28,11 +28,9 @@ function getRepoQuery (name, owner, first, after) {
                   hasNextPage
                   endCursor
                 }
-                totalCount
                 nodes {
                   ... on Commit {
-                    committedDate
-                    additions
+                    committedDate 
                     author { 
                       user {
                         login
@@ -42,7 +40,6 @@ function getRepoQuery (name, owner, first, after) {
                 }
               }
             }
-            abbreviatedOid
           }
         }
       }
@@ -94,31 +91,30 @@ function getRepoHistory (data) {
 
   const repoData = (await callApi(getRepoQuery(repoName, repoOwner, 100))).repository
 
-  while (repoData.defaultBranchRef.target.history.pageInfo.hasPageNext) {
+  while (getRepoHistory(repoData).pageInfo.hasPageNext) {
     const history = getRepoHistory(repoData)
+
     const nextRepoData = (
       await callApi(getRepoQuery(repoName, repoOwner, 100, history.pageInfo.endCursor))
     ).repository
+
     history.nodes.push(...getRepoHistory(nextRepoData).nodes)
     history.pageInfo = getRepoHistory(nextRepoData).pageInfo
   }
 
   let nbCommitsPerUser = getRepoHistory(repoData).nodes.reduce((result, node) => {
-    if (node.author.user) {
-      if (result[node.author.user.login]) {
-        result[node.author.user.login] = result[node.author.user.login] + 1
-      } else {
-        result[node.author.user.login] = 1
-      }
+    const user = node.author.user
+    if (user) {
+      result[user.login] = (result[user.login] || 0) + 1
     }
 
     return result
-  }, {})
+  }, Object.create(null))
 
   const sortedValues = Object.entries(nbCommitsPerUser).sort(([, a], [, b]) => b - a)
-  let topTwoUser = sortedValues.slice(0, 2).map(x => x[0])
+  const topUsers = sortedValues.slice(0, 3).map(x => x[0])
 
-  let users = topTwoUser.map(user => ({ user, after: undefined }))
+  let users = topUsers.map(user => ({ user, after: undefined }))
 
   const issues = await callApi(getIssues(repoName, repoOwner, users, 100))
 
@@ -127,7 +123,7 @@ function getRepoHistory (data) {
       .filter(el => {
         return issues[el.user].issues.pageInfo.hasNext
       })
-      .map(el => ({ ...el, after: issues[el.user].issues.pageInfo.endCursor }))
+      .map(el => ({ user: el.user, after: issues[el.user].issues.pageInfo.endCursor }))
 
     const nextIssuesData = await callApi(getIssues(repoName, repoOwner, users, 100))
 
